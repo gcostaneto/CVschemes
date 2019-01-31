@@ -91,7 +91,7 @@ cv2 <- function(df.y, y, env, part.env=1, eta, seed=1234, f=.2,fold=10,nIter = 2
   cat(paste("Finished at:",Sys.time(),"\n",sep=" "))
   cat(paste("#----------------------------------------------------------------------------#","\n",sep=""))
   fineshedttime <- Sys.time()
-  saveRDS(time=list(starttime,fineshedttime))
+ # saveRDS(time=list(starttime,fineshedttime))
   return(yHat.)
 }
 
