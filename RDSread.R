@@ -6,13 +6,13 @@ RDSread <- function(.path,.pattern,.id="id"){
   setwd(.path)
   LISTF <- list.files(pattern = .pattern)
   LEG <- length(LISTF)
-  cat(paste("Total of",LEG,"files in the directorie",.path,"\n",sep=""))
+  print(paste("Total of",LEG,"files in the directorie",.path,"\n",sep=""))
   output <- c()
   for(L in 1:LEG){
     output <- rbind(output,data.frame(readRDS(LISTF[L]),.id = LISTF[[L]]))
   }
   names(output)[dim(output)[2]]<-.id
   return(output)
-  cat(paste("Data frame containing",dim(output)[1],"rows and", dim(output)[2],"columns \n",sep=""))
+  print(paste("Data frame containing",dim(output)[1],"rows and", dim(output)[2],"columns \n",sep=""))
 
 }
