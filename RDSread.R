@@ -7,7 +7,7 @@ RDSread <- function(.path,.pattern,.id="id"){
 
   LISTF <- list.files(pattern = .pattern)
   LEG <- length(LISTF)
-  cat(paste("Total of,LEG,"files in the directorie",.path,"\n",sep=""))
+  cat(paste("Total of",LEG,"files in the directorie",.path,"\n",sep=""))
   output <- c()
   for(L in 1:LEG){
     output <- rbind(output,data.frame(readRDS(LISTF[L]),.id = LISTF[[L]]))
