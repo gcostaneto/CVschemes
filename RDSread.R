@@ -4,7 +4,6 @@
 #' .id     : name of the index column. If .id = NULL, in this case, "id" is used as colum name.
 RDSread <- function(.path,.pattern,.id="id"){
   setwd(.path)
-
   LISTF <- list.files(pattern = .pattern)
   LEG <- length(LISTF)
   cat(paste("Total of",LEG,"files in the directorie",.path,"\n",sep=""))
