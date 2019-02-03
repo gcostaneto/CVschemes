@@ -26,10 +26,10 @@ cv2 <- function(df.y, y, env, part.env=1, K, seed=1234, f=.2,fold=10,nIter = 2E4
     
     fit <- BGGE(y = df.ycopy$value,
                 K = K,
-                nIter = nIter,
-                burnIn = burnIn,
+                ne = ne,
+                ite = nIter,
+                burn = burnIn,
                 thin = thin,
-                saveAt = saveAt ,
                 verbose = FALSE)
     
     yHat <- data.frame(obs= df.y$value, pred = fit$yHat, gid = df.y$gid, env=df.y$env,pop=NA, fold=i)
