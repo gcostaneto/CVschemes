@@ -1,0 +1,17 @@
+getK.rn <- function(Kc, Kg, Y,X = NULL, type= c("RN","RC"),intercept.random = FALSE){
+   require(BGGE)
+   k.list  <- list(G = Kg, O = Kg)
+   if(type == "RN"){
+     K <- getK(Y = Y, X = X, setKernel = k.list, model = "MDs",intercept.random = intercept.random)
+     K <- list(G= K$G_G, W = K$G_O, GW = K$GE_O)
+     K$W$Kernel  <- Kc
+     K$GW$Kernel <- K$G$Kernel * K$W$Kernel
+   }
+   if(type == "RC"){
+     K <- getK(Y = Y, X = X ,setKernel = k.list, model = "MDs",intercept.random = intercept.random)
+     K <- list(G= K$G_G, W = K$G_O, GE = K$GE_G)
+     K$W$Kernel  <- Kc
+   }
+
+   return(K)
+}
