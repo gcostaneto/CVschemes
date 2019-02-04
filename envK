@@ -1,0 +1,96 @@
+#' ================================================================================================== #'
+#' Environmental kernels and assist tools for environmental covariate quality and genomic prediciton
+#' ================================================================================================== #'
+#'
+#' Author: Germano Martins F. Costa-Neto  germano.cneto@usp.br
+#' Version: 0.8 Piracicaba, Feb 04th
+#' ================================================================================================== #'
+
+
+# provide environmental kernles for reaction norm models
+envKernel<-function(df.cov){
+  #' df.cov: dataframe of environmental covariates
+  #' Zenv  : incidence matrix of environments
+  O <- tcrossprod(df.cov)/ncol(df.cov)
+  H <- crossprod(df.cov)/nrow(df.cov)
+  O <- O +diag(1E-4,nrow=nrow(O),ncol=ncol(O))
+  H <- H +diag(1E-4,nrow=nrow(H),ncol=ncol(H))
+  return(list(H=H,O=O))
+}
+
+
+# provide environmental covariates formats for genomic prediction and phenotypic GxE diagnosis
+envMarker <- function(df.cov,digits=0, format=c("101","rel-01","PCA"), ncp=2){
+  #' df.cov : dataframe of environmental covariates
+  #' digits: number of output digits
+  #' format: environmental marker (012), 
+  #'         centering and scaled to mean 0 and variance 1 (rel-01)
+  #'         principal component analysis (PCA)
+  #' ncp   : number of principal components used (valid only for format="PCA")
+  
+  require(scales)
+  require(FactoMineR)
+  
+  COVARIATES <- df.cov
+  
+  if(format == "rel-01"){
+    COVARIATES <- as.matrix(round(scale(COVARIATES,scale = T,center = T),digits))
+    return(W=COVARIATES)
+  }
+  
+  if(format == "101"){
+    COVARIATES<-round(apply(COVARIATES,2,function(X) scales::rescale(x=X,to=c(-1,1))),digits)
+    return(W=COVARIATES)}
+  
+  if(format == "PCA"){
+    res.pca <- PCA(COVARIATES,graph=FALSE)
+    COVARIATESp <- res.pca$svd$U[,1:ncp]
+    rownames(COVARIATESp) <- row.names(COVARIATES)
+    return(list(W=COVARIATESp,eig=res.pca$eig))}
+}
+
+
+# provide environmental covariate matrix for genomic prediction
+envK <-function(df.cov,df.p,skip=3){
+  df.p <-data.frame(df.p)
+  df.cov <-data.frame(df.cov)
+  df.cov$env <- as.factor(rownames(df.cov))
+  W <- as.matrix(merge(df.p,df.cov, by="env")[,-c(1:skip)])
+  return(W)
+}
+
+# provide variance-covariance matrices for genomic prediciton using BGLR
+var.BGLR <- function(Z,K,cov=c("I","K")){
+  if(cov == "I"){
+    I <- diag(1,nrow=ncol(Z))
+    ZKZt <-  tcrossprod(Z %*% I)
+    return(ZKZt)
+  }
+  if(cov == "K"){
+    ZKZt <-  tcrossprod(Z %*% K)
+    return(ZKZt)
+  }
+  
+}
+
+# provide covariate otimization for genomic prediciton and GxE diagnosis
+OtimCov <- function(df.cov,size=1,res.hcpc=T){
+  require(FactoMineR)
+  oticv<-c()
+  Ws.red <- PCA(t(df.cov))
+  Ws.red <- HCPC(Ws.red,consol = T,graph = F)
+  A<-Ws.red$call$X$clust
+  for(i in 1:nlevels(A)){
+    line<-sample(1:dim(Ws.red$call$X[Ws.red$call$X$clust == levels(A)[i],])[1], size = size, replace = FALSE)
+    oticv<-rbind(oticv,rownames(Ws.red$call$X[Ws.red$call$X$clust == levels(A)[i],])[line])
+  }
+  COV <- data.frame(cov=oticv)
+  if(res.hcpc == TRUE){
+    return(list(res.hcpc = Ws.red, newCov=df.cov[,match(COV$cov,colnames(df.cov))]))
+  }
+  if(res.hcpc == FALSE){
+    return(df.cov[,match(COV$cov,colnames(df.cov))])
+  }
+  
+}
+
