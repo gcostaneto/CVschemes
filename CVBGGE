@@ -1,4 +1,4 @@
-cv2 <- function(df.y, y, env, part.env=1, K, seed=1234, f=.2,fold=10,nIter = 2E4,burnIn = 2E3,thin = 5,saveAt = 'bggeCV_'){
+cv <- function(df.y, y, env, part.env=1, K, seed=1234, f=.2,fold=10,nIter = 2E4,burnIn = 2E3,thin = 5,saveAt = 'bggeCV_'){
   require(BGGE)
   df.y$gid <- as.factor(df.y$gid)
   df.y$env <- as.factor(df.y$env)
@@ -7,7 +7,6 @@ cv2 <- function(df.y, y, env, part.env=1, K, seed=1234, f=.2,fold=10,nIter = 2E4
   yHat. <- c()
   ENVS<-nlevels(env)
   GIDS <- nlevels(df.y$gid)
-  starttime <- Sys.time()
   set.seed(seed)
   for(i in 1:fold){
     
@@ -19,7 +18,7 @@ cv2 <- function(df.y, y, env, part.env=1, K, seed=1234, f=.2,fold=10,nIter = 2E4
     tenv <- unique(df.ycopy$env)[sample(1:ENVS, size = part.env, replace = TRUE)]
     df.ycopy$value[!(df.ycopy$env %in% tenv)] <- NA
 
-    # definying new gid
+   # definying new gid
    # cat(paste("Sampling genotypes...","\n",sep=" "))
     tgid <- unique(df.ycopy$gid)[sample(1:GIDS, size = GIDS * f, replace = FALSE)]
     df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA
@@ -41,13 +40,11 @@ cv2 <- function(df.y, y, env, part.env=1, K, seed=1234, f=.2,fold=10,nIter = 2E4
     yHat$pop[(df.ycopy$env %in% tenv)   &  !(df.ycopy$gid %in% tgid)]   <- "KnowEnv|NewGid"
     
     yHat. <- rbind(yHat.,yHat)
+    seed <- seed + i
   }
   
-
   cat(paste("#----------------------------------------------------------------------------#","\n",sep=""))
   cat(paste("Finished at:",Sys.time(),"\n",sep=" "))
   cat(paste("#----------------------------------------------------------------------------#","\n",sep=""))
-  fineshedttime <- Sys.time()
- # saveRDS(time=list(starttime,fineshedttime))
   return(yHat.)
 }
