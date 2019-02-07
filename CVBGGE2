@@ -1,0 +1,52 @@
+cv2 <- function(df.y, y, env, part.env=1, K, seed=1234, f=.2,fold=10,nIter = 2E4,burnIn = 2E3,thin = 5,saveAt = 'bggeCV_'){
+  require(BGGE)
+  df.y$gid <- as.factor(df.y$gid)
+  df.y$env <- as.factor(df.y$env)
+  (ne <- as.vector(table(df.y$env)))
+  Ze <- model.matrix(~-1+env,df.y)
+  yHat  <- c()
+  yHat. <- c()
+  ENVS<-nlevels(env)
+  GIDS <- nlevels(df.y$gid)
+  set.seed(seed)
+  for(i in 1:fold){
+    
+    cat(paste("#----------------------------------------------------------------------------#","\n",sep=""))
+    cat(paste("Starting fold",i,"at:",Sys.time(),"\n",sep=" "))
+    df.ycopy <- df.y
+    # definying new env
+    #cat(paste("Sampling environments...","\n",sep=" "))
+    tenv <- unique(df.ycopy$env)[sample(1:ENVS, size = part.env, replace = TRUE)]
+    df.ycopy$value[!(df.ycopy$env %in% tenv)] <- NA
+
+   # definying new gid
+   # cat(paste("Sampling genotypes...","\n",sep=" "))
+    tgid <- unique(df.ycopy$gid)[sample(1:GIDS, size = GIDS * f, replace = FALSE)]
+    df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA
+    
+    fit <- BGGE(y = df.ycopy$value,
+                K = K,
+                ne = ne,
+                XF = Ze,
+                ite = nIter,
+                burn = burnIn,
+                thin = thin,
+                verbose = FALSE)
+    
+    yHat <- data.frame(obs= df.y$value, pred = fit$yHat, gid = df.y$gid, env=df.y$env,pop=NA, fold=i)
+    
+    # setting scenario comparisions
+    yHat$pop[(df.ycopy$env %in% tenv)   &  (df.ycopy$gid %in% tgid) ]   <- "KnowEnv|KnowGid"
+    yHat$pop[!(df.ycopy$env %in% tenv)  &  !(df.ycopy$gid %in% tgid)]   <- "NewEnv|NewGid"
+    yHat$pop[!(df.ycopy$env %in% tenv)  &  (df.ycopy$gid %in% tgid) ]   <- "NewEnv|KnowGid"
+    yHat$pop[(df.ycopy$env %in% tenv)   &  !(df.ycopy$gid %in% tgid)]   <- "KnowEnv|NewGid"
+    
+    yHat. <- rbind(yHat.,yHat)
+    seed <- seed + i
+  }
+  
+  cat(paste("#----------------------------------------------------------------------------#","\n",sep=""))
+  cat(paste("Finished at:",Sys.time(),"\n",sep=" "))
+  cat(paste("#----------------------------------------------------------------------------#","\n",sep=""))
+  return(yHat.)
+}
