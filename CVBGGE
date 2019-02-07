@@ -1,4 +1,4 @@
-cv <- function(df.y, y, env, part.env=1, K, seed=1234, f=.2,fold=10,nIter = 2E4,burnIn = 2E3,thin = 5,saveAt = 'bggeCV_',XF=NULL){
+cv <- function(CV = "CV2", df.y, y, env, part.env=1, K, seed=1234, f=.2,fold=10,nIter = 2E4,burnIn = 2E3,thin = 5,saveAt = 'bggeCV_',XF=NULL){
   require(BGGE)
   df.y$gid <- as.factor(df.y$gid)
   df.y$env <- as.factor(df.y$env)
