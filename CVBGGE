@@ -2,7 +2,7 @@ cv <- function(CV = "CV2", df.y, y, env, part.env=1, K, seed=1234, f=.2,fold=10,
   require(BGGE)
   df.y$gid <- as.factor(df.y$gid)
   df.y$env <- as.factor(df.y$env)
-  (ne <- as.vector(table(df.y$env)))
+
   yHat  <- c()
   yHat. <- c()
   ENVS<-nlevels(env)
@@ -30,7 +30,7 @@ cv <- function(CV = "CV2", df.y, y, env, part.env=1, K, seed=1234, f=.2,fold=10,
     tgid <- unique(df.ycopy$gid)[sample(1:GIDS, size = GIDS * f, replace = FALSE)]
     df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA
     }
-    
+    ne <- as.vector(table(df.ycopy$env))
     fit <- BGGE(y = df.ycopy$value,
                 K = K,
                 XF = XF,
