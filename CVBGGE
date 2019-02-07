@@ -58,7 +58,7 @@ cv <- function(CV = "CV2", df.y, y, env, part.env=1, K, seed=1234, f=.2,fold=10,
     seed <- seed + i
   }
   #cat(paste("----------------------------------------------------------------------------","\n",sep=""))
-  cat(paste("Finished at:",Sys.time(),"\n",sep=" "))
+  cat(paste(".........Finished at:",Sys.time(),"\n",sep=" "))
   cat(paste("#---------------------------------------#","\n",sep=""))
   return(yHat.)
 }
