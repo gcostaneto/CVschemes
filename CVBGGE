@@ -50,14 +50,13 @@ cv <- function(CV = "CV2", df.y, y, env, part.env=1, K, seed=1234, f=.2,fold=10,
     yHat$pop[(df.ycopy$env %in% tenv)   &  !(df.ycopy$gid %in% tgid)]   <- "KnowEnv|NewGid"
     }
     if(CV == "CV1"){
-    yHat$pop[ (df.ycopy$gid %in% tgid) ]   <- "KnowEnv|KnowGid"
-    yHat$pop[!(df.ycopy$gid %in% tgid)]   <- "KnowEnv|NewGid"
+    yHat$pop[ (df.ycopy$gid %in% tgid)]   <- "KnowEnv|KnowGid"
+    yHat$pop[!(df.ycopy$gid %in% tgid)]    <- "KnowEnv|NewGid"
     }
     
     yHat. <- rbind(yHat.,yHat)
     seed <- seed + i
   }
-  
   cat(paste("#----------------------------------------------------------------------------#","\n",sep=""))
   cat(paste("Finished at:",Sys.time(),"\n",sep=" "))
   cat(paste("#----------------------------------------------------------------------------#","\n",sep=""))
