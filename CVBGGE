@@ -1,73 +1,73 @@
-cv <- function(CV = "CV2", df.y, y, env, part.env=1, K, type = c("random","optmized"), TS=NULL, seed=1234, f=.2,fold=10,nIter = 2E4,burnIn = 2E3,thin = 5,saveAt = 'bggeCV_',XF=NULL){
+cv <- function(CV = c("CV1","CV2"), df.y, y, env, part.env=1, 
+               K, type = c("random","optmized"), 
+               TS=NULL, seed=1234, f=.2,fold=10,
+               nIter = 2E4,burnIn = 2E3,thin = 5,
+               saveAt = 'bggeCV_',XF=NULL){
   require(BGGE)
+  #' --------------------------------------------------------------------------------------------------
+  ##' Processing stage
+  #' --------------------------------------------------------------------------------------------------
   df.y$gid <- as.factor(df.y$gid)
   df.y$env <- as.factor(df.y$env)
-
+  
   yHat  <- c()
   yHat. <- c()
   ENVS<-nlevels(env)
   GIDS <- nlevels(df.y$gid)
   set.seed(seed)
+  
   for(i in 1:fold){
     
-    #cat(paste("#----------------------------------------------------------------------------#","\n",sep=""))
     cat(paste("Starting fold",i,"at:",Sys.time(),"\n",sep=" "))
     df.ycopy <- df.y
-    # definying new env
-    #cat(paste("Sampling environments...","\n",sep=" "))
+    
+    #' --------------------------------------------------------------------------------------------------
+    ##' Cross-validation type
+    #' --------------------------------------------------------------------------------------------------
     if(CV == "CV2"){
-        tenv <- unique(df.ycopy$env)[sample(1:ENVS, size = part.env, replace = TRUE)]
-        df.ycopy$value[!(df.ycopy$env %in% tenv)] <- NA
-
-   # definying new gid
-   # cat(paste("Sampling genotypes...","\n",sep=" "))
-   if(type == "random"){
-     tgid <- unique(df.ycopy$gid)[sample(1:GIDS, size = GIDS * f, replace = FALSE)]
-    df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA}
-    if(type == "optmized"){
-    tgid <- TS
-    df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA}
+      tenv <- unique(df.ycopy$env)[sample(1:ENVS, size = part.env, replace = TRUE)]
+      df.ycopy$value[!(df.ycopy$env %in% tenv)] <- NA
+      
+      if(type == "random")  {tgid <- unique(df.ycopy$gid)[sample(1:GIDS, size = GIDS * f, replace = FALSE)]}
+      if(type == "optmized"){tgid <- TS}
+      df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA
     }
+    #' --------------------------------------------------------------------------------------------------
     if(CV == "CV1"){
-     # definying new gid
-   # cat(paste("Sampling genotypes...","\n",sep=" "))
-    if(type == "random"){
-     tgid <- unique(df.ycopy$gid)[sample(1:GIDS, size = GIDS * f, replace = FALSE)]
-    df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA}
-    if(type == "optmized"){
-    tgid <- TS
-    df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA}
+      if(type == "random")  {tgid <- unique(df.ycopy$gid)[sample(1:GIDS, size = GIDS * f, replace = FALSE)]}
+      if(type == "optmized"){tgid <- TS
+      df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA}
     }
-    }
+    #' --------------------------------------------------------------------------------------------------
+    ##' Genomic enabled prediction
     ne <- as.vector(table(df.ycopy$env))
-    fit <- BGGE(y = df.ycopy$value,
-                K = K,
-                XF = XF,
-                ne = ne,
-                ite = nIter,
-                burn = burnIn,
-                thin = thin,
-                verbose = FALSE)
-    
-    yHat <- data.frame(obs= df.y$value, pred = fit$yHat, gid = df.y$gid, env=df.y$env,pop=NA, fold=i)
-    
-    # setting scenario comparisions
-    if(CV == "CV2"){
-    yHat$pop[(df.ycopy$env %in% tenv)   &  (df.ycopy$gid %in% tgid) ]   <- "KnowEnv|KnowGid"
+        fit <- BGGE(y = df.ycopy$value,K = K,XF = XF,
+                    ne = ne,
+                    ite = nIter,
+                    burn = burnIn,
+                    thin = thin,
+                    verbose = FALSE)
+  
+  yHat <- data.frame(obs= df.y$value, pred = fit$yHat, gid = df.y$gid, env=df.y$env,pop=NA, process=i)
+  #' --------------------------------------------------------------------------------------------------
+  # setting scenario comparisions
+  #' --------------------------------------------------------------------------------------------------
+  if(CV == "CV2"){
+    yHat$pop[( df.ycopy$env %in% tenv)  &   (df.ycopy$gid %in% tgid)]   <- "KnowEnv|KnowGid"
     yHat$pop[!(df.ycopy$env %in% tenv)  &  !(df.ycopy$gid %in% tgid)]   <- "NewEnv|NewGid"
-    yHat$pop[!(df.ycopy$env %in% tenv)  &  (df.ycopy$gid %in% tgid) ]   <- "NewEnv|KnowGid"
-    yHat$pop[(df.ycopy$env %in% tenv)   &  !(df.ycopy$gid %in% tgid)]   <- "KnowEnv|NewGid"
-    }
-    if(CV == "CV1"){
-    yHat$pop[ (df.ycopy$gid %in% tgid)]   <- "KnowEnv|KnowGid"
-    yHat$pop[!(df.ycopy$gid %in% tgid)]    <- "KnowEnv|NewGid"
-    }
-    
-    yHat. <- rbind(yHat.,yHat)
-    seed <- seed + i
+    yHat$pop[!(df.ycopy$env %in% tenv)  &   (df.ycopy$gid %in% tgid)]   <- "NewEnv|KnowGid"
+    yHat$pop[ (df.ycopy$env %in% tenv)  &  !(df.ycopy$gid %in% tgid)]   <- "KnowEnv|NewGid"
   }
-  #cat(paste("----------------------------------------------------------------------------","\n",sep=""))
-  cat(paste("Complete at:",Sys.time(),"\n",sep=" "))
-  cat(paste("---------------------------------------","\n",sep=""))
-  return(yHat.)
+  if(CV == "CV1"){
+    yHat$pop[ (df.ycopy$gid %in% tgid)]   <- "KnowEnv|KnowGid"
+    yHat$pop[!(df.ycopy$gid %in% tgid)]   <- "KnowEnv|NewGid"
+  }
+  
+  yHat. <- rbind(yHat.,yHat)
+  seed <- seed + i
+}
+  #' --------------------------------------------------------------------------------------------------
+cat(paste("Complete at:",Sys.time(),"\n",sep=" "))
+cat(paste("---------------------------------------","\n",sep=""))
+return(yHat.)
 }
