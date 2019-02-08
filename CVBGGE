@@ -1,4 +1,4 @@
-cv <- function(CV = "CV2", df.y, y, env, part.env=1, K, seed=1234, f=.2,fold=10,nIter = 2E4,burnIn = 2E3,thin = 5,saveAt = 'bggeCV_',XF=NULL){
+cv <- function(CV = "CV2", df.y, y, env, part.env=1, K, type = c("random","optmized"), TS=NULL, seed=1234, f=.2,fold=10,nIter = 2E4,burnIn = 2E3,thin = 5,saveAt = 'bggeCV_',XF=NULL){
   require(BGGE)
   df.y$gid <- as.factor(df.y$gid)
   df.y$env <- as.factor(df.y$env)
@@ -16,19 +16,28 @@ cv <- function(CV = "CV2", df.y, y, env, part.env=1, K, seed=1234, f=.2,fold=10,
     # definying new env
     #cat(paste("Sampling environments...","\n",sep=" "))
     if(CV == "CV2"){
-       tenv <- unique(df.ycopy$env)[sample(1:ENVS, size = part.env, replace = TRUE)]
-    df.ycopy$value[!(df.ycopy$env %in% tenv)] <- NA
+        tenv <- unique(df.ycopy$env)[sample(1:ENVS, size = part.env, replace = TRUE)]
+        df.ycopy$value[!(df.ycopy$env %in% tenv)] <- NA
 
    # definying new gid
    # cat(paste("Sampling genotypes...","\n",sep=" "))
-    tgid <- unique(df.ycopy$gid)[sample(1:GIDS, size = GIDS * f, replace = FALSE)]
-    df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA
+   if(type == "random"){
+     tgid <- unique(df.ycopy$gid)[sample(1:GIDS, size = GIDS * f, replace = FALSE)]
+    df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA}
+    if(type == "optmized"){
+    tgid <- TS
+    df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA}
     }
     if(CV == "CV1"){
      # definying new gid
    # cat(paste("Sampling genotypes...","\n",sep=" "))
-    tgid <- unique(df.ycopy$gid)[sample(1:GIDS, size = GIDS * f, replace = FALSE)]
-    df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA
+    if(type == "random"){
+     tgid <- unique(df.ycopy$gid)[sample(1:GIDS, size = GIDS * f, replace = FALSE)]
+    df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA}
+    if(type == "optmized"){
+    tgid <- TS
+    df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA}
+    }
     }
     ne <- as.vector(table(df.ycopy$env))
     fit <- BGGE(y = df.ycopy$value,
@@ -58,7 +67,7 @@ cv <- function(CV = "CV2", df.y, y, env, part.env=1, K, seed=1234, f=.2,fold=10,
     seed <- seed + i
   }
   #cat(paste("----------------------------------------------------------------------------","\n",sep=""))
-  cat(paste(".........Finished at:",Sys.time(),"\n",sep=" "))
-  cat(paste("#---------------------------------------#","\n",sep=""))
+  cat(paste("Complete at:",Sys.time(),"\n",sep=" "))
+  cat(paste("---------------------------------------","\n",sep=""))
   return(yHat.)
 }
