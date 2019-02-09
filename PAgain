@@ -1,0 +1,14 @@
+PA.gain <- function(.df,.ref = "MM",.fun=c("mean","median")){
+            require(plyr)
+  if(.fun == "mean"){
+    ganho<-acast(ddply(.df,.(Model,pop),summarise,value=mean(value)),formula = Model~pop,value.var="value")}
+  if(.fun == "median"){
+    ganho<-acast(ddply(.df,.(Model,pop),summarise,value=median(value)),formula = Model~pop,value.var="value")}
+
+  ref   <-ganho[which(rownames(ganho) == .ref),]
+  ganho <- ganho[-which(rownames(ganho) == .ref),]
+  for(i in 1:nrow(ganho)){
+    ganho[i,] <- 100*(1-ref/ganho[i,])
+  }
+  return(ganho)
+}
