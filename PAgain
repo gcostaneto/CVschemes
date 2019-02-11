@@ -1,7 +1,5 @@
-gain <- function(.df,.ref = "MM",.fun=c("mean","median"),.value=value){
+gain <- function(.df,.ref = "MM",.fun=c("mean","median")){
             require(plyr)
-            
-            .df <- data.frame(.df,value=.df[,.value])
   if(.fun == "mean"){
     ganho<-acast(ddply(.df,.(Model,pop),summarise,value=mean(value)),formula = Model~pop,value.var="value")}
   if(.fun == "median"){
@@ -14,3 +12,4 @@ gain <- function(.df,.ref = "MM",.fun=c("mean","median"),.value=value){
   }
   return(ganho)
 }
+
