@@ -1,0 +1,11 @@
+CS <- function(.df,
+               .y,
+               .yhat,
+               .selint,
+               .decreasing =T){
+  
+  y.sel    <- .df$gid[order(.y,decreasing = .decreasing )  ][1:(round(length(.y)*.selint,0))]
+  yhat.sel <- .df$gid[order(.yhat,decreasing = .decreasing )][1:(round(length(.y)*.selint,0))]
+  cs <- (sum(y.sel%in%yhat.sel)/(round(length(.y)*.selint,0)))
+  return(cs)
+}
