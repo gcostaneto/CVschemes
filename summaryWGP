@@ -21,15 +21,13 @@ summary.WGP <- function(.scenario, .path, .selint=.05,.fun="mean",.decreasing = 
     names(cs)[4] = "value"
     sc <- rbind(sc,data.frame(cs,scenario = scenario.list[s]))
     for(k in 1:length(.refModel)){
-      gain <- gain(.df = model.pa,.fun = "mean",.ref = .refModel[k])
-      gainModel<- rbind(gainModel,data.frame(gain, Model= rownames(gain),
+      gain. <- gain(.df = model.pa,.fun = "mean",.ref = .refModel[k])
+      gainModel<- rbind(gainModel,data.frame(gain., Model= rownames(gain.),
                                              ref = .refModel[k],scenario = scenario.list[s]))
       scgain<-gain(.df = cs,.fun = .fun,.ref = .refModel[k])
       sc.model  <- rbind(sc.model,data.frame(scgain, Model = rownames(scgain),
                                              scenario = scenario.list[s]))
       }
-    
-    
   }  
   geral<-data.frame(summarySE(model.pa[model.pa$value>.threshold,],measurevar="value",groupvars=c("Model","pop")))
   
