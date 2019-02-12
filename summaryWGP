@@ -1,4 +1,7 @@
 summary.WGP <- function(.scenario, .path, .selint=.05,.fun="mean",.decreasing = TRUE, .threshold=-1,.refModel=c("MM","MDS"),.id = "model"){
+              source("https://raw.githubusercontent.com/gcostaneto/GPscripts/master/RDSread.R") # reading several output RDS
+              source("https://raw.githubusercontent.com/gcostaneto/GPscripts/master/PAgain")    # for PA and SC comparisions
+              source("https://raw.githubusercontent.com/gcostaneto/GPscripts/master/CS")        # selection
   scenario.list <-.scenario    
   gainModel <- c()
   sc.model <- c()
