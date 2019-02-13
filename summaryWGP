@@ -13,17 +13,17 @@ summary.WGP <- function(.scenario, .path, .selint=.05,.fun="mean",.decreasing = 
     .pattern = paste(.sep,scenario.list[s],.sep,sep="")
     df.res   = RDSread(.path = .path, .pattern = .pattern , .id = .id)
     # a ser editado manualmente  -------------------------------------------------
-    df.res   = data.frame(df.res,colsplit(df.res[,.id],"-",c("set","scenario","Model")))
-    model.pa = ddply(df.res,.(Model,pop,process),summarise, value = cor(obs,pred))
-    pa.by.model = rbind(pa.by.model,model.pa)
-    cs <- ddply(df.res,.(Model,pop,process), 
-                function(x) CS(.df = x,.y = x$obs,.yhat = x$pred,.selint = .selint,.decreasing = .decreasing))
+    df.res   = try(data.frame(df.res,colsplit(df.res[,.id],"-",c("set","scenario","Model"))))
+    model.pa = try(ddply(df.res,.(Model,pop,process),summarise, value = cor(obs,pred)))
+    pa.by.model = try(rbind(pa.by.model,model.pa))
+    cs <- try(ddply(df.res,.(Model,pop,process), 
+                function(x) CS(.df = x,.y = x$obs,.yhat = x$pred,.selint = .selint,.decreasing = .decreasing)))
     names(cs)[4] = "value"
     sc <- rbind(sc,data.frame(cs,scenario = scenario.list[s]))
     for(k in 1:length(.refModel)){
-      gain. <- gain(.df = model.pa,.fun = "mean",.ref = .refModel[k])
-      gainModel<- rbind(gainModel,data.frame(gain., Model= rownames(gain.),
-                                             ref = .refModel[k],scenario = scenario.list[s]))
+      gain. <- try(gain(.df = model.pa,.fun = "mean",.ref = .refModel[k]))
+      gainModel<- try(rbind(gainModel,data.frame(gain., Model= rownames(gain.),
+                                             ref = .refModel[k],scenario = scenario.list[s])))
       scgain<-gain(.df = cs,.fun = .fun,.ref = .refModel[k])
       sc.model  <- rbind(sc.model,data.frame(scgain, Model = rownames(scgain),
                                              scenario = scenario.list[s]))
