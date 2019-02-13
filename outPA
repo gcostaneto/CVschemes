@@ -1,0 +1,13 @@
+out.pa <- function(.scenario, .path, .sep="-",.id="model",outputname="output"){
+  source("https://raw.githubusercontent.com/gcostaneto/GPscripts/master/RDSread.R")
+  scenario.list = .scenario  
+  out.res = c()
+  for(s in 1:length(scenario.list)){
+    # importing all data  -------------------------------------------------
+    .pattern = paste(.sep,scenario.list[s],.sep,sep="")
+    df.res   = RDSread(.path = .path, .pattern = .pattern , .id = .id)
+    df.res   = data.frame(df.res,colsplit(df.res[,.id],"-",c("set","scenario","Model")))
+    out.res  = rbind(out.res,df.res)
+    saveRDS(out.res,outputname)
+    model.pa = ddply(df.res,.(Model,pop,process,scenario),summarise, value = cor(obs,pred))}
+  return(model.pa)}
