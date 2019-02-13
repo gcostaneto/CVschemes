@@ -8,5 +8,5 @@ out.pa <- function(.scenario, .path, .sep="-",outputname="output"){
     df.res   = RDSread(.path = .path, .pattern = .pattern , .id = "model")
     out.res  = rbind(out.res,data.frame(df.res,colsplit(df.res$model,"-",c("set","scenario","Model"))))
     saveRDS(out.res,outputname)}
-   model.pa = ddply(df.res,.(Model,pop,process,scenario),summarise, value = cor(obs,pred))
+   model.pa = ddply(out.res,.(Model,pop,process,scenario),summarise, value = cor(obs,pred))
   return(model.pa)}
