@@ -6,7 +6,7 @@ out.pa <- function(.scenario, .path, .sep="-",outputname="output"){
     # importing all data  -------------------------------------------------
     .pattern = paste(.sep,scenario.list[s],.sep,sep="")
     df.res   = RDSread(.path = .path, .pattern = .pattern , .id = "model")
-    out.res  = rbind(out.res,data.frame(df.res,colsplit(df.res$model,.sep,c("set","scenario","Model"))))
-    saveRDS(out.res,outputname)
-    model.pa = ddply(df.res,.(Model,pop,process,scenario),summarise, value = cor(obs,pred))}
+    out.res  = rbind(out.res,data.frame(df.res,colsplit(df.res$model,"-",c("set","scenario","Model"))))
+    saveRDS(out.res,outputname)}
+   model.pa = ddply(df.res,.(Model,pop,process,scenario),summarise, value = cor(obs,pred))
   return(model.pa)}
