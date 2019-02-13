@@ -9,5 +9,5 @@ out.pa <- function(.scenario, .path, .sep="-",.id="model",outputname="output"){
     df.res   = data.frame(df.res,colsplit(df.res[,.id],.sep,c("set","scenario","Model")))
     out.res  = rbind(out.res,df.res)
     saveRDS(out.res,outputname)
-    model.pa = ddply(df.res,.(Model,pop,process,scenario),summarise, value = cor(obs,pred,use="complete.cases"))}
+    model.pa = ddply(df.res,.(Model,pop,process,scenario),summarise, value = cor(obs,pred))}
   return(model.pa)}
