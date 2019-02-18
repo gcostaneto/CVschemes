@@ -1,0 +1,13 @@
+Vcomp.BGGE <-function(K,digits=4){
+  size = length(K)
+  comps <- data.frame(matrix(NA,ncol=3,nrow=size))
+  names(comps) = c("K","Var","SD.var")
+  comps$Var = names(K)
+  
+  for(k in 1:size){
+    comps [k,1] = names(K)[k]
+    comps [k,2] = round(K[[k]]$varu,digits)
+    comps [k,3] = round(K[[k]]$varu.sd,digits)
+  }
+  return(comps)
+}
