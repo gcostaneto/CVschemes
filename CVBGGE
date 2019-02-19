@@ -35,8 +35,8 @@ cv <- function(CV = c("CV1","CV2"), df.y, y, env, part.env=1,
     #' --------------------------------------------------------------------------------------------------
     if(CV == "CV1"){
       if(type == "random")  {tgid <- unique(df.ycopy$gid)[sample(1:GIDS, size = GIDS * f, replace = FALSE)]}
-      if(type == "optmized"){tgid <- TS
-      df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA}
+      if(type == "optmized"){tgid <- TS}
+      df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA
     }
     #' --------------------------------------------------------------------------------------------------
     ##' Genomic enabled prediction
