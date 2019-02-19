@@ -1,5 +1,5 @@
 
-cv <- function(CV = c("CV1","CV2"), df.y, y, env, part.env=1, 
+cv <- function(CV = c("CV1","CV2","CV3"), df.y, y, env, part.env=1, 
                type = c("random","optmized"), 
                TS=NULL, seed=1234, f=.2,fold=10,
                method="OLS",H=NULL,A=NULL,
@@ -26,11 +26,20 @@ cv <- function(CV = c("CV1","CV2"), df.y, y, env, part.env=1,
     #' --------------------------------------------------------------------------------------------------
     ##' Cross-validation type
     #' --------------------------------------------------------------------------------------------------
-    if(CV == "CV2"){
+    if(CV == "CV3"){
       tenv <- unique(df.ycopy$env)[sample(1:ENVS, size = part.env, replace = TRUE)]
       df.ycopy$value[!(df.ycopy$env %in% tenv)] <- NA
       
       if(type == "random")  {tgid <- unique(df.ycopy$gid)[sample(1:GIDS, size = GIDS * f, replace = FALSE)]}
+      if(type == "optmized"){tgid <- TS}
+      df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA
+    }
+    #' --------------------------------------------------------------------------------------------------
+    if(CV == "CV2"){
+      tenv <- unique(df.ycopy$env)[sample(1:ENVS, size = part.env, replace = TRUE)]
+      df.ycopy$value[!(df.ycopy$env %in% tenv)] <- NA
+      
+      if(type == "random")  {tgid <- unique(df.ycopy$gid)[sample(1:length(y), size = length(y) * f, replace = FALSE)]}
       if(type == "optmized"){tgid <- TS}
       df.ycopy$value[!(df.ycopy$gid %in% tgid)] <- NA
     }
@@ -56,6 +65,12 @@ cv <- function(CV = c("CV1","CV2"), df.y, y, env, part.env=1,
     #' --------------------------------------------------------------------------------------------------
     # setting scenario comparisions
     #' --------------------------------------------------------------------------------------------------
+    if(CV == "CV3"){
+      yHat$pop[( df.ycopy$env %in% tenv)  &   (df.ycopy$gid %in% tgid)]   <- "KnowEnv|KnowGid"
+      yHat$pop[!(df.ycopy$env %in% tenv)  &  !(df.ycopy$gid %in% tgid)]   <- "NewEnv|NewGid"
+      yHat$pop[!(df.ycopy$env %in% tenv)  &   (df.ycopy$gid %in% tgid)]   <- "NewEnv|KnowGid"
+      yHat$pop[ (df.ycopy$env %in% tenv)  &  !(df.ycopy$gid %in% tgid)]   <- "KnowEnv|NewGid"
+    }
     if(CV == "CV2"){
       yHat$pop[( df.ycopy$env %in% tenv)  &   (df.ycopy$gid %in% tgid)]   <- "KnowEnv|KnowGid"
       yHat$pop[!(df.ycopy$env %in% tenv)  &  !(df.ycopy$gid %in% tgid)]   <- "NewEnv|NewGid"
