@@ -13,3 +13,9 @@ gain <- function(.df,.ref = "MM",.fun=c("mean","median")){
   return(ganho)
 }
 
+require(plyr)
+gain.scenario = function(.df,.fun="mean",.ref="MM"){
+  (gain.scenario <- ddply(.df, .(scenario), function(x) data.frame(gain(.df = x,.fun = .fun,.ref = .ref),
+                                                                          Model=rownames(gain(.df = x,.fun = .fun,.ref = .ref)))))
+  return(gain.scenario)
+}
