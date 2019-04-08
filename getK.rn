@@ -8,7 +8,6 @@ getK.rn = function(Ke = NULL,
   cat("Kernel Matrix for GE prediction models \n")
   cat("See BGGE package vignette for more details \n")
   cat("----------------------------------------------------- \n")
-  
   if(!any(model %in% c("MM","MDs"))){stop("Model not specified. Choose between MM or MDs")}
   
   n = length(Kg)
@@ -17,7 +16,7 @@ getK.rn = function(Ke = NULL,
   if(!is.null(Ke)){
     if(!any(type %in% c("RN","RE"))){stop("Model not specified. Choose between RN or RE")}
     if(type == "RN"){
-      cat(paste("Building ",model," with reaction norm effects \n"),sep="")
+      cat(paste("Building ",model," with reaction norm effects (W) \n"),sep="")
       K$E = list(Kernel = Ke, Type = "D")
       j = length(K)
       for(i in 1:n){
@@ -26,12 +25,18 @@ getK.rn = function(Ke = NULL,
       
     }
     if(type == "RE"){
-      cat(paste("Building ",model," with random environmental kernel \n"),sep="")
+      cat(paste("Building ",model," with random environmental kernel (E) \n"),sep="")
       K$E = list(Kernel = Ke, Type = "D")
     }
   }else{
     cat(paste("Building ",model," with fixed environmental effects \n"),sep="")
   }
+  if(model == "MDs" & type == "RN"){
+    cat("----------------------------------------------------- \n")    
+    cat("ATTENTION!!: Model with GxE plus reaction norm. 
+        This might not be the best option because 
+        the model may be over-parameterized \n")
+    cat("----------------------------------------------------- \n")}
   cat(paste("Kernel:",names(K),"\n",sep=" "))
   cat("----------------------------------------------------- \n")
   return(K)
