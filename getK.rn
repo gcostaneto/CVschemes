@@ -6,8 +6,8 @@ getK.rn = function(Ke = NULL,
   require(BGGE)
   cat("----------------------------------------------------- \n")
   cat("Kernel Matrix for GE prediction models \n")
-  cat("----------------------------------------------------- \n")
   cat("See BGGE package vignette for more details \n")
+  cat("----------------------------------------------------- \n")
   
   if(!any(model %in% c("MM","MDs"))){stop("Model not specified. Choose between MM or MDs")}
   
