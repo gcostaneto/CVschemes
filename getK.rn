@@ -1,17 +1,39 @@
-getK.rn <- function(Kc, Kg, Y,X = NULL, type= c("RN","RC"),intercept.random = FALSE){
-   require(BGGE)
-   k.list  <- list(G = Kg, O = Kg)
-   if(type == "RN"){
-     K <- getK(Y = Y, X = X, setKernel = k.list, model = "MDs",intercept.random = intercept.random)
-     K <- list(G= K$G_G, W = K$G_O, GW = K$GE_O)
-     K$W$Kernel  <- Kc
-     K$GW$Kernel <- K$G$Kernel * K$W$Kernel
-   }
-   if(type == "RC"){
-     K <- getK(Y = Y, X = X ,setKernel = k.list, model = "MDs",intercept.random = intercept.random)
-     K <- list(G= K$G_G, W = K$G_O, GE = K$GE_G)
-     K$W$Kernel  <- Kc
-   }
-
-   return(K)
+getK.rn = function(Ke = NULL,
+                  Kg, Y,X = NULL,
+                  model = c("MM","MDs"),
+                  type= c("RN","RE"),
+                  intercept.random = FALSE){
+  require(BGGE)
+  cat("----------------------------------------------------- \n")
+  cat("Kernel Matrix for GE prediction models \n")
+  cat("----------------------------------------------------- \n")
+  cat("See BGGE package vignette for more details \n")
+  
+  if(!any(model %in% c("MM","MDs"))){stop("Model not specified. Choose between MM or MDs")}
+  
+  n = length(Kg)
+  K = getK(Y = Y, X = X, setKernel = Kg, model = model,intercept.random = intercept.random)
+  
+  if(!is.null(Ke)){
+    if(!any(type %in% c("RN","RE"))){stop("Model not specified. Choose between RN or RE")}
+    if(type == "RN"){
+      cat(paste("Building ",model," with reaction norm effects \n"),sep="")
+      K$E = list(Kernel = Ke, Type = "D")
+      j = length(K)
+      for(i in 1:n){
+        K[[j+i]] = list(Kernel = Ke*K[[i]]$Kernel,Type="D")
+        names(K)[j+i] = paste("W",names(K)[i],sep="_")}
+      
+    }
+    if(type == "RE"){
+      cat(paste("Building ",model," with random environmental kernel \n"),sep="")
+      K$E = list(Kernel = Ke, Type = "D")
+    }
+  }else{
+    cat(paste("Building ",model," with fixed environmental effects \n"),sep="")
+  }
+  cat(paste("Kernel:",names(K),"\n",sep=" "))
+  cat("----------------------------------------------------- \n")
+  return(K)
 }
+
