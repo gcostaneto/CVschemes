@@ -61,7 +61,8 @@ cv <- function(CV = c("CV1","CV2","CV3"), df.y, y, env, part.env=1,
              nIter =nIter, 
              thin=thin,burnIn = burnIn)
     
-    yHat <- data.frame(obs= df.y$value, pred = fit$yhat, gid = df.y$gid, env=df.y$env,pop=NA, process=i)
+    yHat <- data.frame(obs= df.y$value, pred = fit$yhat, gid = df.y$gid, env=df.y$env,pop=NA, process=i,b=fit$b)
+    names(yHat)[c(2,6)] = c("yhat","beta")
     #' --------------------------------------------------------------------------------------------------
     # setting scenario comparisions
     #' --------------------------------------------------------------------------------------------------
