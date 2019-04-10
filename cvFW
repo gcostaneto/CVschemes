@@ -61,8 +61,9 @@ cv <- function(CV = c("CV1","CV2","CV3"), df.y, y, env, part.env=1,
              nIter =nIter, 
              thin=thin,burnIn = burnIn)
     
-    yHat <- data.frame(obs= df.y$value, pred = fit$yhat, gid = df.y$gid, env=df.y$env,pop=NA, process=i,b=fit$b+1)
-    names(yHat)[c(2,7)] = c("yhat","beta")
+    yHat <- data.frame(obs= df.y$value, pred = fit$yhat, gid = df.y$gid, env=df.y$env,pop=NA, process=i)
+    names(yHat)[2]
+    beta = data.frame(pred.b=yHat$b, gid = df.y$gid, process=i)
     #' --------------------------------------------------------------------------------------------------
     # setting scenario comparisions
     #' --------------------------------------------------------------------------------------------------
@@ -77,6 +78,8 @@ cv <- function(CV = c("CV1","CV2","CV3"), df.y, y, env, part.env=1,
       yHat$pop[!(df.ycopy$env %in% tenv)  &  !(df.ycopy$gid %in% tgid)]   <- "NewEnv|NewGid"
       yHat$pop[!(df.ycopy$env %in% tenv)  &   (df.ycopy$gid %in% tgid)]   <- "NewEnv|KnowGid"
       yHat$pop[ (df.ycopy$env %in% tenv)  &  !(df.ycopy$gid %in% tgid)]   <- "KnowEnv|NewGid"
+      
+      
     }
     if(CV == "CV1"){
       yHat$pop[ (df.ycopy$gid %in% tgid)]   <- "KnowEnv|KnowGid"
@@ -89,5 +92,5 @@ cv <- function(CV = c("CV1","CV2","CV3"), df.y, y, env, part.env=1,
   #' --------------------------------------------------------------------------------------------------
   cat(paste("Complete at:",Sys.time(),"\n",sep=" "))
   cat(paste("---------------------------------------","\n",sep=""))
-  return(yHat.)
+  return(list(yHat.=yHat.,beta=beta))
 }
