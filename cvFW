@@ -91,5 +91,5 @@ cv <- function(CV = c("CV1","CV2","CV3"), df.y, y, env, part.env=1,
   #' --------------------------------------------------------------------------------------------------
   cat(paste("Complete at:",Sys.time(),"\n",sep=" "))
   cat(paste("---------------------------------------","\n",sep=""))
-  return(list(yHat.=yHat.,beta=beta))
+  return(yHat.)
 }
