@@ -1,0 +1,30 @@
+summary.selection = function(.df,
+                    .y,
+                    .yhat,
+                    .selint,
+                    .decreasing =T){
+  
+  # number of genotypes
+  n = nlevels(.df$gid)
+  
+  # selected genotypes
+  y.sel    = .df$gid[order(.y,decreasing = .decreasing)   ][1:(n*.selint)]
+  yhat.sel = .df$gid[order(.yhat,decreasing = .decreasing)][1:(n*.selint)]
+  
+  # selection coincidence
+  cs = sum(y.sel %in% yhat.sel)/(n*.selint)
+  
+  # selection differential (observed)
+  dif.sel  = mean(.y[.df$gid %in% y.sel]) - mean(.y[!.df$gid %in% y.sel])
+  gain.sel = 1-(dif.sel/mean(.y))
+  
+  # selection differential (predicted)
+  dif.sel2  = mean(.yhat[.df$gid %in% yhat.sel]) - mean(.yhat[!.df$gid %in% yhat.sel])
+  gain.sel2 = 1-(dif.sel2/mean(.yhat))
+  
+
+  return(list(y.sel = y.sel,yhat.sel = yhat.sel,
+              y.difSel = gain.sel,yhat.difSel = dif.sel2,
+              gain.y = gain.sel, gain.yhat = gain.sel2,
+              cs=cs))
+}
